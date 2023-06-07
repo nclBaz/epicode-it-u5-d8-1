@@ -19,4 +19,11 @@ public class User {
 	private String surname;
 	private String email;
 
+	public User(String name, String surname, String email) {
+		super();
+		this.name = name;
+		this.surname = surname;
+		this.email = email;
+	}
+
 }
