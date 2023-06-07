@@ -6,13 +6,18 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import riccardogulin.u5d8.exceptions.BadRequestException;
+import riccardogulin.u5d8.exceptions.NotFoundException;
+
 @Service
 public class UsersService {
 	@Autowired
 	private UsersRepository usersRepo;
 
 	public User create(User u) {
-		// TODO: check if email already exists
+		usersRepo.findByEmail(u.getEmail()).ifPresent(user -> {
+			throw new BadRequestException("Email " + user.getEmail() + " already in use!");
+		});
 
 		return usersRepo.save(u);
 	}
@@ -21,11 +26,11 @@ public class UsersService {
 		return usersRepo.findAll();
 	}
 
-	public User findById(UUID id) throws Exception {
-		return usersRepo.findById(id).orElseThrow(() -> new Exception("Utente non trovato!"));
+	public User findById(UUID id) throws NotFoundException {
+		return usersRepo.findById(id).orElseThrow(() -> new NotFoundException("Utente non trovato!"));
 	}
 
-	public User findByIdAndUpdate(UUID id, User u) throws Exception {
+	public User findByIdAndUpdate(UUID id, User u) throws NotFoundException {
 		User found = this.findById(id);
 
 		found.setId(id);
@@ -36,7 +41,7 @@ public class UsersService {
 		return usersRepo.save(found);
 	}
 
-	public void findByIdAndDelete(UUID id) throws Exception {
+	public void findByIdAndDelete(UUID id) throws NotFoundException {
 		User found = this.findById(id);
 		usersRepo.delete(found);
 	}
