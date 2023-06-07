@@ -1,14 +1,27 @@
 package riccardogulin.u5d8.exceptions;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorsPayload> handleValidationErrors(MethodArgumentNotValidException ex) {
+		List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getDefaultMessage())
+				.collect(Collectors.toList());
+
+		ErrorsPayload payload = new ErrorsPayload(errors.get(0), new Date(), 400);
+
+		return new ResponseEntity<ErrorsPayload>(payload, HttpStatus.BAD_REQUEST);
+	}
 
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<ErrorsPayload> handleBadRequest(BadRequestException e) {

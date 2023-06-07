@@ -11,19 +11,20 @@ import org.springframework.stereotype.Service;
 
 import riccardogulin.u5d8.exceptions.BadRequestException;
 import riccardogulin.u5d8.exceptions.NotFoundException;
+import riccardogulin.u5d8.users.payloads.UserRegistrationPayload;
 
 @Service
 public class UsersService {
 	@Autowired
 	private UsersRepository usersRepo;
 
-	public User create(User u) {
+	public User create(UserRegistrationPayload u) {
 		// TODO: check if email already exists
 		usersRepo.findByEmail(u.getEmail()).ifPresent(user -> {
 			throw new BadRequestException("Email " + user.getEmail() + " already in use!");
 		});
-
-		return usersRepo.save(u);
+		User newUser = new User(u.getName(), u.getSurname(), u.getEmail());
+		return usersRepo.save(newUser);
 	}
 
 	public Page<User> find(int page, int size, String sortBy) {
