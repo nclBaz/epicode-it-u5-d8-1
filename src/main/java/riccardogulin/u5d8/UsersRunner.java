@@ -19,12 +19,17 @@ public class UsersRunner implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		Faker faker = new Faker(new Locale("it"));
-		for (int i = 0; i < 20; i++) {
-			String name = faker.name().firstName();
-			String surname = faker.name().lastName();
-			String email = faker.internet().emailAddress();
-			User user = new User(name, surname, email);
-			// usersService.create(user);
+		for (int i = 0; i < 3; i++) {
+			try {
+
+				String name = faker.name().firstName();
+				String surname = faker.name().lastName();
+				String email = faker.internet().emailAddress();
+				User user = new User(name, surname, email);
+				// usersService.create(user);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		}
 
 	}

@@ -1,9 +1,12 @@
 package riccardogulin.u5d8.users;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import riccardogulin.u5d8.exceptions.BadRequestException;
@@ -15,6 +18,7 @@ public class UsersService {
 	private UsersRepository usersRepo;
 
 	public User create(User u) {
+		// TODO: check if email already exists
 		usersRepo.findByEmail(u.getEmail()).ifPresent(user -> {
 			throw new BadRequestException("Email " + user.getEmail() + " already in use!");
 		});
@@ -22,8 +26,14 @@ public class UsersService {
 		return usersRepo.save(u);
 	}
 
-	public List<User> find() {
-		return usersRepo.findAll();
+	public Page<User> find(int page, int size, String sortBy) {
+		if (size < 0)
+			size = 10;
+		if (size > 100)
+			size = 100;
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+		return usersRepo.findAll(pageable);
 	}
 
 	public User findById(UUID id) throws NotFoundException {
